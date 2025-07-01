@@ -1,7 +1,7 @@
 pipeline{
   agent any
   environment {
-    IMAGE_NAME = 'parth2k3/test-flask'
+    IMAGE_NAME = 'commodorebob/test-flask'
   }
   stages {
     stage('Checkout') {
