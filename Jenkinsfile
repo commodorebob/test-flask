@@ -1,29 +1,53 @@
-pipeline{
+pipeline {
   agent any
+
   environment {
-    IMAGE_NAME = 'commodorebob/test-flask'
+    AWS_REGION = 'us-east-1'
+    IMAGE_NAME = 'test-flask'
+    REPO_NAME = 'test'
   }
+
   stages {
     stage('Checkout') {
       steps {
         git branch: 'main', url: 'https://github.com/commodorebob/test-flask'
-      } 
-    }
-    stage('Build Docker image'){
-      steps{
-        bat "docker build -t %IMAGE_NAME%:latest ."
       }
     }
-     stage('Push to Dockerhub'){
-      steps{
-        withCredentials([usernamePassword(credentialsId: '12eeebe0-edbb-461d-b452-22ba234f5af3', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-        bat """
-        echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
-        docker push %IMAGE_NAME%:latest
-        docker logout
-        """
+
+    stage('Tag the image') {
+      steps {
+        script {
+          env.IMAGE_TAG = 'latest'
         }
       }
-    } 
+    }
+
+    stage('Login to ECR') {
+      steps {
+        withAWS(region: "${env.AWS_REGION}", credentials: 'aws_creds') {
+          powershell '''
+            $ecrLogin = aws ecr get-login-password --region $env:AWS_REGION
+            docker login --username AWS --password $ecrLogin https://004234227389.dkr.ecr.us-east-2.amazonaws.com/test
+          '''
+        }
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        powershell '''
+          docker build -t $env:IMAGE_NAME:$env:IMAGE_TAG .
+          docker tag $env:IMAGE_NAME:$env:IMAGE_TAG 004234227389.dkr.ecr.us-east-2.amazonaws.com/test:latest
+        '''
+      }
+    }
+
+    stage('Push to ECR') {
+      steps {
+        powershell '''
+          docker push 004234227389.dkr.ecr.us-east-2.amazonaws.com/test:latest
+        '''
+      }
+    }
   }
 }
