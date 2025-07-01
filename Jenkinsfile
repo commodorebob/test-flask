@@ -6,7 +6,7 @@ pipeline{
   stages {
     stage('Checkout') {
       steps {
-        git branch 'main', url: 'https://github.com/commodorebob/test-flask'
+        git branch: 'main', url: 'https://github.com/commodorebob/test-flask'
       } 
     }
     stage('Build Docker image'){
