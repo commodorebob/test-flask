@@ -4,8 +4,10 @@ pipeline{
     IMAGE_NAME = 'parth2k3/test-flask'
   }
   stages {
-    steps {
-      git branch 'main', url: 'https://github.com/commodorebob/test-flask'
+    stage('Checkout') {
+      steps {
+        git branch 'main', url: 'https://github.com/commodorebob/test-flask'
+      } 
     }
   }
   stage('Build Docker image'){
