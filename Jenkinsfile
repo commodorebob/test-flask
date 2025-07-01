@@ -2,10 +2,10 @@ pipeline {
   agent any
 
   environment {
-    AWS_REGION = 'us-east-2' // ✅ match the ECR region
+    AWS_REGION = 'us-east-1' // ✅ match the ECR region
     IMAGE_NAME = 'test-flask'
     REPO_NAME = 'test'
-    ECR_REGISTRY = '004234227389.dkr.ecr.us-east-2.amazonaws.com'
+    ECR_REGISTRY = '004234227389.dkr.ecr.us-east-1.amazonaws.com'
   }
 
   stages {
